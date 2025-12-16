@@ -241,7 +241,7 @@ export default function LoginPage() {
                             <SelectValue placeholder="Select your state" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
+                        <SelectContent className="max-h-60 overflow-y-auto">
                           {INDIAN_STATES.map((state) => (
                             <SelectItem key={state} value={state}>
                               {state}
