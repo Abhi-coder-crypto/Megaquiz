@@ -13,6 +13,13 @@ export async function registerRoutes(
   app.post("/api/participants", async (req, res) => {
     try {
       const validatedData = insertParticipantSchema.parse(req.body);
+      
+      // Check if user has already submitted the quiz
+      const hasSubmitted = await storage.hasSubmittedQuiz(validatedData.email);
+      if (hasSubmitted) {
+        return res.status(400).json({ error: "You have already completed this quiz. Each participant can only submit once." });
+      }
+      
       const participant = await storage.createParticipant(validatedData);
       res.json(participant);
     } catch (error: any) {

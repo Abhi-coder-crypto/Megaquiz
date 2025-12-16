@@ -27,15 +27,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { name, email, phone } = validatedData;
       
       const db = await getDb();
-      const collection = db.collection('participants');
+      const participantsCol = db.collection('participants');
+      const submissionsCol = db.collection('submissions');
       
-      const doc = { name, email, phone, createdAt: new Date() };
-      const result = await collection.insertOne(doc);
+      // Check if user has already submitted the quiz
+      const existingParticipant = await participantsCol.findOne({ email: email.toLowerCase() });
+      if (existingParticipant) {
+        const existingSubmission = await submissionsCol.findOne({ participantId: existingParticipant._id.toString() });
+        if (existingSubmission) {
+          return res.status(400).json({ error: 'You have already completed this quiz. Each participant can only submit once.' });
+        }
+      }
+      
+      const doc = { name, email: email.toLowerCase(), phone, createdAt: new Date() };
+      const result = await participantsCol.insertOne(doc);
       
       return res.status(200).json({
         _id: result.insertedId.toString(),
         name,
-        email,
+        email: email.toLowerCase(),
         phone,
         createdAt: doc.createdAt,
       });

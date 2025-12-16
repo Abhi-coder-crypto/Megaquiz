@@ -10,6 +10,8 @@ import type {
 export interface IStorage {
   createParticipant(participant: InsertParticipant): Promise<Participant>;
   getParticipant(id: string): Promise<Participant | undefined>;
+  getParticipantByEmail(email: string): Promise<Participant | undefined>;
+  hasSubmittedQuiz(email: string): Promise<boolean>;
   createSubmission(submission: InsertSubmission): Promise<Submission>;
   getAllSubmissions(): Promise<SubmissionWithParticipant[]>;
 }
@@ -44,6 +46,7 @@ class MongoStorage implements IStorage {
     
     const doc = {
       ...insertParticipant,
+      email: insertParticipant.email.toLowerCase(),
       createdAt: new Date(),
     };
     
@@ -52,6 +55,7 @@ class MongoStorage implements IStorage {
     return {
       _id: result.insertedId.toString(),
       ...insertParticipant,
+      email: doc.email,
       createdAt: doc.createdAt,
     };
   }
@@ -73,6 +77,42 @@ class MongoStorage implements IStorage {
       };
     } catch {
       return undefined;
+    }
+  }
+
+  async getParticipantByEmail(email: string): Promise<Participant | undefined> {
+    const db = await this.getDb();
+    const collection = db.collection("participants");
+    
+    try {
+      const doc = await collection.findOne({ email: email.toLowerCase() });
+      if (!doc) return undefined;
+      
+      return {
+        _id: doc._id.toString(),
+        name: doc.name,
+        email: doc.email,
+        phone: doc.phone,
+        createdAt: doc.createdAt,
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  async hasSubmittedQuiz(email: string): Promise<boolean> {
+    const db = await this.getDb();
+    const participantsCol = db.collection("participants");
+    const submissionsCol = db.collection("submissions");
+    
+    try {
+      const participant = await participantsCol.findOne({ email: email.toLowerCase() });
+      if (!participant) return false;
+      
+      const submission = await submissionsCol.findOne({ participantId: participant._id.toString() });
+      return !!submission;
+    } catch {
+      return false;
     }
   }
 
