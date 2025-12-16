@@ -14,21 +14,35 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address").regex(/@gmail\.com$/i, "Only Gmail addresses are allowed"),
-  phone: z.string().regex(/^\+91[0-9]{10}$/, "Enter valid Indian mobile number (+91 followed by 10 digits)"),
+  email: z
+    .string()
+    .email("Invalid email address")
+    .regex(/@gmail\.com$/i, "Only Gmail addresses are allowed"),
+  phone: z
+    .string()
+    .regex(
+      /^\+91[0-9]{10}$/,
+      "Enter valid Indian mobile number (+91 followed by 10 digits)",
+    ),
 });
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,12 +58,12 @@ export default function LoginPage() {
       const participant = await api.createParticipant(values);
       localStorage.setItem("quiz_participant_id", participant._id);
       localStorage.setItem("quiz_participant_name", participant.name);
-      
+
       toast({
         title: "Welcome",
         description: "You have successfully registered.",
       });
-      
+
       setLocation("/quiz");
     } catch (error: any) {
       toast({
@@ -69,7 +83,7 @@ export default function LoginPage() {
         <div className="absolute top-[20%] -left-[10%] w-[400px] h-[400px] rounded-full bg-blue-400/5 blur-3xl" />
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -77,17 +91,24 @@ export default function LoginPage() {
       >
         <div className="flex flex-col items-center mb-8">
           <img src="/vonasec-logo.png" alt="Vonasec" className="h-24 mb-4" />
-          <p className="text-slate-500 text-sm font-medium tracking-wide uppercase mt-1 text-center">Surgical Infection Decision Quiz</p>
+          <p className="text-slate-500 text-sm font-medium tracking-wide uppercase mt-1 text-center">
+            Surgical Infection Decision Quiz
+          </p>
         </div>
 
         <Card className="border-slate-200 shadow-xl shadow-slate-200/50 backdrop-blur-sm bg-white/80">
           <CardHeader>
             <CardTitle className="text-xl">Participant Login</CardTitle>
-            <CardDescription>Enter your details to start the quiz.</CardDescription>
+            <CardDescription>
+              Enter your details to start the quiz.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="name"
@@ -95,13 +116,17 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input data-testid="input-name" placeholder="Dr. John Doe" {...field} />
+                        <Input
+                          data-testid="input-name"
+                          placeholder="Dr. John Doe"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={form.control}
                   name="email"
@@ -109,7 +134,12 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Email Address (Gmail only)</FormLabel>
                       <FormControl>
-                        <Input data-testid="input-email" placeholder="john@gmail.com" type="email" {...field} />
+                        <Input
+                          data-testid="input-email"
+                          placeholder="john@gmail.com"
+                          type="email"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -123,24 +153,31 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Mobile Number</FormLabel>
                       <FormControl>
-                        <Input data-testid="input-phone" placeholder="9876543210" maxLength={10} {...field} />
+                        <Input
+                          data-testid="input-phone"
+                          placeholder="9876543210"
+                          maxLength={10}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <Button data-testid="button-submit" type="submit" className="w-full mt-2" size="lg" disabled={isLoading}>
+                <Button
+                  data-testid="button-submit"
+                  type="submit"
+                  className="w-full mt-2"
+                  size="lg"
+                  disabled={isLoading}
+                >
                   {isLoading ? "Please wait..." : "Start Quiz"}
                 </Button>
               </form>
             </Form>
           </CardContent>
         </Card>
-        
-        <div className="mt-8 text-center">
-            <Link href="/admin" className="text-xs text-slate-400 hover:text-primary transition-colors">Admin Access</Link>
-        </div>
       </motion.div>
     </div>
   );
