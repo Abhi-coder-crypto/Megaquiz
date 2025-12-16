@@ -96,14 +96,14 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md z-10 px-4"
       >
-        <div className="flex flex-col items-center mb-8">
+        <div className="flex flex-col items-center mb-4">
           <img 
             src="/mega-cv-logo.png" 
             alt="MEGA-CV" 
-            className="h-28 mb-4" 
+            className="h-20 mb-2" 
             style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}
           />
-          <p className="text-slate-500 text-sm font-medium tracking-wide uppercase mt-1 text-center">
+          <p className="text-slate-500 text-sm font-medium tracking-wide uppercase text-center">
             Surgical Infection Decision Quiz
           </p>
         </div>
