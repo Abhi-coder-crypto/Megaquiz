@@ -1,5 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { MongoClient, ObjectId } from 'mongodb';
+import { z } from 'zod';
+
+const insertParticipantSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address").regex(/@gmail\.com$/i, "Only Gmail addresses are allowed"),
+  phone: z.string().regex(/^[0-9]{10}$/, "Enter valid 10 digit mobile number"),
+});
 
 const uri = process.env.MONGODB_URI || '';
 
@@ -16,17 +23,8 @@ async function getDb() {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
     try {
-      const { name, email, phone } = req.body;
-      
-      if (!name || name.length < 2) {
-        return res.status(400).json({ error: 'Name must be at least 2 characters' });
-      }
-      if (!email || !/@gmail\.com$/i.test(email)) {
-        return res.status(400).json({ error: 'Only Gmail addresses are allowed' });
-      }
-      if (!phone || !/^[0-9]{10}$/.test(phone)) {
-        return res.status(400).json({ error: 'Enter valid 10 digit mobile number' });
-      }
+      const validatedData = insertParticipantSchema.parse(req.body);
+      const { name, email, phone } = validatedData;
       
       const db = await getDb();
       const collection = db.collection('participants');
@@ -42,6 +40,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         createdAt: doc.createdAt,
       });
     } catch (error: any) {
+      if (error.name === 'ZodError') {
+        const messages = error.errors.map((e: any) => e.message).join(', ');
+        return res.status(400).json({ error: messages });
+      }
       console.error('Error creating participant:', error);
       return res.status(500).json({ error: 'Failed to create participant' });
     }

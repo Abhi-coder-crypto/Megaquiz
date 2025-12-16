@@ -1,5 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { MongoClient, ObjectId } from 'mongodb';
+import { z } from 'zod';
+
+const insertSubmissionSchema = z.object({
+  participantId: z.string().min(1, "Participant ID required"),
+  answers: z.record(z.string(), z.string()),
+});
 
 const uri = process.env.MONGODB_URI || '';
 
@@ -16,14 +22,8 @@ async function getDb() {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
     try {
-      const { participantId, answers } = req.body;
-      
-      if (!participantId || typeof participantId !== 'string') {
-        return res.status(400).json({ error: 'Participant ID required' });
-      }
-      if (!answers || typeof answers !== 'object') {
-        return res.status(400).json({ error: 'Answers required' });
-      }
+      const validatedData = insertSubmissionSchema.parse(req.body);
+      const { participantId, answers } = validatedData;
       
       const db = await getDb();
       const collection = db.collection('submissions');
@@ -38,6 +38,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         submittedAt: doc.submittedAt,
       });
     } catch (error: any) {
+      if (error.name === 'ZodError') {
+        const messages = error.errors.map((e: any) => e.message).join(', ');
+        return res.status(400).json({ error: messages });
+      }
       console.error('Error creating submission:', error);
       return res.status(500).json({ error: 'Failed to submit answers' });
     }
@@ -75,7 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
           }
         } catch {
-          // Skip invalid participants
+          // Skip submissions with invalid participant references
         }
       }
       

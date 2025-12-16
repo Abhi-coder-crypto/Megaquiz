@@ -69,3 +69,23 @@ Preferred communication style: Simple, everyday language.
 - `ADMIN_PASSWORD`: Admin login password (server-side)
 
 Note: The project includes Drizzle configuration for PostgreSQL but currently uses MongoDB. The Drizzle setup (`drizzle.config.ts`) references `DATABASE_URL` which is not used by the active MongoDB implementation.
+
+## Vercel Deployment
+
+This project is configured for Vercel deployment with serverless API functions.
+
+### Deployment Steps
+1. Connect your GitHub repository to Vercel
+2. Add the `MONGODB_URI` environment variable in Vercel project settings
+3. Deploy - Vercel will automatically build and deploy
+
+### Vercel Configuration
+- **Build Command**: `vite build --outDir dist`
+- **Output Directory**: `dist`
+- **API Routes**: Located in `/api` folder as serverless functions
+  - `api/participants.ts` - Participant registration
+  - `api/submissions.ts` - Quiz submissions
+  - `api/admin/login.ts` - Admin authentication
+
+### Environment Variables for Vercel
+- `MONGODB_URI`: MongoDB connection string (required)
