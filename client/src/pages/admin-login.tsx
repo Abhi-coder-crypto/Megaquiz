@@ -70,7 +70,12 @@ export default function AdminLoginPage() {
         className="w-full max-w-sm z-10 px-4"
       >
         <div className="flex justify-center mb-8">
-          <img src="/vonasec-logo.png" alt="Vonasec" className="h-20" />
+          <img 
+            src="/mega-cv-logo.png" 
+            alt="MEGA-CV" 
+            className="h-24" 
+            style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}
+          />
         </div>
 
         <Card className="border-slate-800 bg-slate-950 text-slate-50 shadow-2xl">

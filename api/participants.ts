@@ -30,34 +30,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const participantsCol = db.collection('participants');
       const submissionsCol = db.collection('submissions');
       
-      // Check if user has already submitted the quiz (by email) - case insensitive search
-      const existingParticipantByEmail = await participantsCol.findOne({ 
+      // Find ALL participants with this email (case insensitive)
+      const participantsByEmail = await participantsCol.find({ 
         email: { $regex: new RegExp(`^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
-      });
-      if (existingParticipantByEmail) {
-        // Check for submission using both string and ObjectId formats
-        const existingSubmission = await submissionsCol.findOne({ 
-          $or: [
-            { participantId: existingParticipantByEmail._id.toString() },
-            { participantId: existingParticipantByEmail._id }
-          ]
-        });
-        if (existingSubmission) {
+      }).toArray();
+      
+      // Check if any of them have submissions
+      for (const participant of participantsByEmail) {
+        const submission = await submissionsCol.findOne({ participantId: participant._id.toString() });
+        if (submission) {
           return res.status(400).json({ error: 'This email has already been used to complete the quiz. Each participant can only submit once.' });
         }
       }
       
-      // Check if user has already submitted the quiz (by phone)
-      const existingParticipantByPhone = await participantsCol.findOne({ phone: phone });
-      if (existingParticipantByPhone) {
-        // Check for submission using both string and ObjectId formats
-        const existingSubmission = await submissionsCol.findOne({ 
-          $or: [
-            { participantId: existingParticipantByPhone._id.toString() },
-            { participantId: existingParticipantByPhone._id }
-          ]
-        });
-        if (existingSubmission) {
+      // Find ALL participants with this phone
+      const participantsByPhone = await participantsCol.find({ phone: phone }).toArray();
+      
+      // Check if any of them have submissions
+      for (const participant of participantsByPhone) {
+        const submission = await submissionsCol.findOne({ participantId: participant._id.toString() });
+        if (submission) {
           return res.status(400).json({ error: 'This phone number has already been used to complete the quiz. Each participant can only submit once.' });
         }
       }
