@@ -4,7 +4,7 @@ import { z } from "zod";
 export const insertParticipantSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address").regex(/@gmail\.com$/i, "Only Gmail addresses are allowed"),
-  phone: z.string().regex(/^\+91[0-9]{10}$/, "Enter valid Indian mobile number (+91 followed by 10 digits)"),
+  phone: z.string().regex(/^[0-9]{10}$/, "Enter valid 10 digit mobile number"),
 });
 
 export const insertSubmissionSchema = z.object({

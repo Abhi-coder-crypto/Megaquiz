@@ -86,17 +86,22 @@ export default function AdminDashboard() {
 
     // Build CSV rows
     const rows = submissions.map(sub => {
-      const row = [
-        sub.participant.name,
-        sub.participant.email,
-        sub.participant.phone,
-        new Date(sub.submittedAt).toLocaleString(),
-      ];
+      const row: string[] = [];
+      
+      // Escape and quote helper function
+      const escapeCSV = (value: string) => {
+        const escaped = value.replace(/"/g, '""');
+        return `"${escaped}"`;
+      };
+      
+      row.push(escapeCSV(sub.participant.name));
+      row.push(escapeCSV(sub.participant.email));
+      row.push(escapeCSV(sub.participant.phone));
+      row.push(escapeCSV(new Date(sub.submittedAt).toLocaleString()));
       
       QUIZ_QUESTIONS.forEach(q => {
-        const answer = sub.answers[q.id] || "";
-        // Escape quotes and wrap in quotes
-        row.push(`"${answer.replace(/"/g, '""')}"`);
+        const answer = sub.answers[String(q.id)] || "";
+        row.push(escapeCSV(answer));
       });
       
       return row.join(",");

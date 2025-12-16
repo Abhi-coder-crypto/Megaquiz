@@ -34,7 +34,7 @@ export default function LoginPage() {
     defaultValues: {
       name: "",
       email: "",
-      phone: "+91",
+      phone: "",
     },
   });
 
@@ -123,7 +123,7 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Mobile Number</FormLabel>
                       <FormControl>
-                        <Input data-testid="input-phone" placeholder="+919876543210" {...field} />
+                        <Input data-testid="input-phone" placeholder="9876543210" maxLength={10} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
