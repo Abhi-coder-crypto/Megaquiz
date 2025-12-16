@@ -64,8 +64,8 @@ Preferred communication style: Simple, everyday language.
 - `wouter`: Lightweight routing
 
 ### Environment Variables Required
-- `MONGODB_URI`: MongoDB connection string
-- `ADMIN_USERNAME`: Admin login username (server-side)
+- `MONGO_URI`: MongoDB connection string
+- `ADMIN_EMAIL`: Admin login email (server-side)
 - `ADMIN_PASSWORD`: Admin login password (server-side)
 
 Note: The project includes Drizzle configuration for PostgreSQL but currently uses MongoDB. The Drizzle setup (`drizzle.config.ts`) references `DATABASE_URL` which is not used by the active MongoDB implementation.
@@ -76,7 +76,10 @@ This project is configured for Vercel deployment with serverless API functions.
 
 ### Deployment Steps
 1. Connect your GitHub repository to Vercel
-2. Add the `MONGODB_URI` environment variable in Vercel project settings
+2. Add the following environment variables in Vercel project settings:
+   - `MONGO_URI`: Your MongoDB connection string
+   - `ADMIN_EMAIL`: Admin login email
+   - `ADMIN_PASSWORD`: Admin login password
 3. Deploy - Vercel will automatically build and deploy
 
 ### Vercel Configuration
@@ -88,4 +91,6 @@ This project is configured for Vercel deployment with serverless API functions.
   - `api/admin/login.ts` - Admin authentication
 
 ### Environment Variables for Vercel
-- `MONGODB_URI`: MongoDB connection string (required)
+- `MONGO_URI`: MongoDB connection string (required)
+- `ADMIN_EMAIL`: Admin login email (required)
+- `ADMIN_PASSWORD`: Admin login password (required)

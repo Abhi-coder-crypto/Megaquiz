@@ -8,7 +8,7 @@ const insertParticipantSchema = z.object({
   phone: z.string().regex(/^[0-9]{10}$/, "Enter valid 10 digit mobile number"),
 });
 
-const uri = process.env.MONGODB_URI || '';
+const uri = process.env.MONGO_URI || '';
 
 let cachedClient: MongoClient | null = null;
 

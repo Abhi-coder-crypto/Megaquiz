@@ -7,7 +7,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   
   const { username, password } = req.body;
   
-  if (username === 'megacv@gmail.com' && password === 'megacv') {
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  
+  if (!adminEmail || !adminPassword) {
+    return res.status(500).json({ success: false, error: 'Server configuration error' });
+  }
+  
+  if (username === adminEmail && password === adminPassword) {
     return res.status(200).json({ success: true, message: 'Login successful' });
   }
   

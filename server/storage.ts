@@ -15,18 +15,22 @@ export interface IStorage {
 }
 
 class MongoStorage implements IStorage {
-  private client: MongoClient;
+  private client: MongoClient | null = null;
   private db: Db | null = null;
 
   constructor() {
-    const uri = process.env.MONGODB_URI;
-    if (!uri) {
-      throw new Error("MONGODB_URI environment variable is required");
+    const uri = process.env.MONGO_URI;
+    if (uri) {
+      this.client = new MongoClient(uri);
+    } else {
+      console.warn("MONGO_URI environment variable is not set. Database operations will fail.");
     }
-    this.client = new MongoClient(uri);
   }
 
   private async getDb(): Promise<Db> {
+    if (!this.client) {
+      throw new Error("MONGO_URI environment variable is required for database operations");
+    }
     if (!this.db) {
       await this.client.connect();
       this.db = this.client.db("megacv_quiz");

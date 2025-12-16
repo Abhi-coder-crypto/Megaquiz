@@ -68,8 +68,14 @@ export async function registerRoutes(
   app.post("/api/admin/login", async (req, res) => {
     const { username, password } = req.body;
     
-    // Admin credentials
-    if (username === "megacv@gmail.com" && password === "megacv") {
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    
+    if (!adminEmail || !adminPassword) {
+      return res.status(500).json({ success: false, error: "Server configuration error" });
+    }
+    
+    if (username === adminEmail && password === adminPassword) {
       res.json({ success: true, message: "Login successful" });
     } else {
       res.status(401).json({ success: false, error: "Invalid credentials" });
