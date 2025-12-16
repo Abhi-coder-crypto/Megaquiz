@@ -30,12 +30,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const participantsCol = db.collection('participants');
       const submissionsCol = db.collection('submissions');
       
-      // Check if user has already submitted the quiz
-      const existingParticipant = await participantsCol.findOne({ email: email.toLowerCase() });
-      if (existingParticipant) {
-        const existingSubmission = await submissionsCol.findOne({ participantId: existingParticipant._id.toString() });
+      // Check if user has already submitted the quiz (by email)
+      const existingParticipantByEmail = await participantsCol.findOne({ email: email.toLowerCase() });
+      if (existingParticipantByEmail) {
+        const existingSubmission = await submissionsCol.findOne({ participantId: existingParticipantByEmail._id.toString() });
         if (existingSubmission) {
-          return res.status(400).json({ error: 'You have already completed this quiz. Each participant can only submit once.' });
+          return res.status(400).json({ error: 'This email has already been used to complete the quiz. Each participant can only submit once.' });
+        }
+      }
+      
+      // Check if user has already submitted the quiz (by phone)
+      const existingParticipantByPhone = await participantsCol.findOne({ phone: phone });
+      if (existingParticipantByPhone) {
+        const existingSubmission = await submissionsCol.findOne({ participantId: existingParticipantByPhone._id.toString() });
+        if (existingSubmission) {
+          return res.status(400).json({ error: 'This phone number has already been used to complete the quiz. Each participant can only submit once.' });
         }
       }
       

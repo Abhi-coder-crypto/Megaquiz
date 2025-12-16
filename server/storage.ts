@@ -11,7 +11,7 @@ export interface IStorage {
   createParticipant(participant: InsertParticipant): Promise<Participant>;
   getParticipant(id: string): Promise<Participant | undefined>;
   getParticipantByEmail(email: string): Promise<Participant | undefined>;
-  hasSubmittedQuiz(email: string): Promise<boolean>;
+  hasSubmittedQuiz(email: string, phone?: string): Promise<{ submitted: boolean; reason?: string }>;
   createSubmission(submission: InsertSubmission): Promise<Submission>;
   getAllSubmissions(): Promise<SubmissionWithParticipant[]>;
 }
@@ -100,19 +100,35 @@ class MongoStorage implements IStorage {
     }
   }
 
-  async hasSubmittedQuiz(email: string): Promise<boolean> {
+  async hasSubmittedQuiz(email: string, phone?: string): Promise<{ submitted: boolean; reason?: string }> {
     const db = await this.getDb();
     const participantsCol = db.collection("participants");
     const submissionsCol = db.collection("submissions");
     
     try {
-      const participant = await participantsCol.findOne({ email: email.toLowerCase() });
-      if (!participant) return false;
+      // Check by email
+      const participantByEmail = await participantsCol.findOne({ email: email.toLowerCase() });
+      if (participantByEmail) {
+        const submission = await submissionsCol.findOne({ participantId: participantByEmail._id.toString() });
+        if (submission) {
+          return { submitted: true, reason: "email" };
+        }
+      }
       
-      const submission = await submissionsCol.findOne({ participantId: participant._id.toString() });
-      return !!submission;
+      // Check by phone if provided
+      if (phone) {
+        const participantByPhone = await participantsCol.findOne({ phone: phone });
+        if (participantByPhone) {
+          const submission = await submissionsCol.findOne({ participantId: participantByPhone._id.toString() });
+          if (submission) {
+            return { submitted: true, reason: "phone" };
+          }
+        }
+      }
+      
+      return { submitted: false };
     } catch {
-      return false;
+      return { submitted: false };
     }
   }
 
