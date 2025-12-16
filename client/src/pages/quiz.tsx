@@ -110,7 +110,7 @@ export default function QuizPage() {
             <img
               src="/mega-cv-logo.png"
               alt="MEGA-CV"
-              className="h-10 rotate-90 origin-center"
+              className="h-28 rotate-90 origin-center"
             />
           </div>
 
