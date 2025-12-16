@@ -100,8 +100,7 @@ export default function LoginPage() {
           <img 
             src="/mega-cv-logo.png" 
             alt="MEGA-CV" 
-            className="h-20 mb-2" 
-            style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}
+            className="h-12 mb-2" 
           />
           <p className="text-slate-500 text-sm font-medium tracking-wide uppercase text-center">
             Surgical Infection Decision Quiz
