@@ -100,7 +100,7 @@ export default function LoginPage() {
           <img 
             src="/mega-cv-logo.jpg" 
             alt="MEGA-CV" 
-            className="h-14 mb-2" 
+            className="h-20 mb-2" 
           />
           <p className="text-slate-500 text-sm font-medium tracking-wide uppercase text-center">
             Surgical Infection Decision Quiz

@@ -124,7 +124,10 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-20">
-        <h1 className="text-xl font-bold text-slate-800">Admin Dashboard</h1>
+        <div className="flex items-center gap-3">
+          <img src="/mega-cv-logo.jpg" alt="MEGA-CV" className="h-10" />
+          <h1 className="text-xl font-bold text-slate-800">Admin Dashboard</h1>
+        </div>
         <div className="flex items-center gap-3">
             <Button variant="outline" size="sm" onClick={exportToCSV}>
                 <Download className="w-4 h-4 mr-2" />

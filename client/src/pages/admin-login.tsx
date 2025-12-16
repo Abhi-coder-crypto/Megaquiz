@@ -69,12 +69,11 @@ export default function AdminLoginPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-sm z-10 px-4"
       >
-        <div className="flex justify-center mb-8">
+        <div className="flex justify-center mb-6">
           <img 
-            src="/mega-cv-logo.png" 
+            src="/mega-cv-logo.jpg" 
             alt="MEGA-CV" 
-            className="h-24" 
-            style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}
+            className="h-16" 
           />
         </div>
 
