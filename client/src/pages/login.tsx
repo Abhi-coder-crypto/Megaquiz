@@ -1,0 +1,151 @@
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
+import { Activity } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { api } from "@/lib/api";
+
+const formSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address").regex(/@gmail\.com$/i, "Only Gmail addresses are allowed"),
+  phone: z.string().regex(/^\+91[0-9]{10}$/, "Enter valid Indian mobile number (+91 followed by 10 digits)"),
+});
+
+export default function LoginPage() {
+  const [, setLocation] = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "+91",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const participant = await api.createParticipant(values);
+      localStorage.setItem("quiz_participant_id", participant._id);
+      localStorage.setItem("quiz_participant_name", participant.name);
+      
+      toast({
+        title: "Welcome",
+        description: "You have successfully registered.",
+      });
+      
+      setLocation("/quiz");
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to register. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div className="absolute -top-[20%] -right-[10%] w-[600px] h-[600px] rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute top-[20%] -left-[10%] w-[400px] h-[400px] rounded-full bg-blue-400/5 blur-3xl" />
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md z-10 px-4"
+      >
+        <div className="flex flex-col items-center mb-8">
+          <div className="bg-primary/10 p-4 rounded-2xl mb-4">
+             <Activity className="w-12 h-12 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight text-center">MEGA CV</h1>
+          <p className="text-slate-500 text-sm font-medium tracking-wide uppercase mt-1 text-center">Surgical Infection Decision Quiz</p>
+        </div>
+
+        <Card className="border-slate-200 shadow-xl shadow-slate-200/50 backdrop-blur-sm bg-white/80">
+          <CardHeader>
+            <CardTitle className="text-xl">Participant Login</CardTitle>
+            <CardDescription>Enter your details to start the quiz.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input data-testid="input-name" placeholder="Dr. John Doe" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address (Gmail only)</FormLabel>
+                      <FormControl>
+                        <Input data-testid="input-email" placeholder="john@gmail.com" type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mobile Number</FormLabel>
+                      <FormControl>
+                        <Input data-testid="input-phone" placeholder="+919876543210" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button data-testid="button-submit" type="submit" className="w-full mt-2" size="lg" disabled={isLoading}>
+                  {isLoading ? "Please wait..." : "Start Quiz"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+        
+        <div className="mt-8 text-center">
+            <Link href="/admin" className="text-xs text-slate-400 hover:text-primary transition-colors">Admin Access</Link>
+        </div>
+      </motion.div>
+    </div>
+  );
+}

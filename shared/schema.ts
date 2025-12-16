@@ -1,18 +1,32 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// Validation schemas
+export const insertParticipantSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address").regex(/@gmail\.com$/i, "Only Gmail addresses are allowed"),
+  phone: z.string().regex(/^\+91[0-9]{10}$/, "Enter valid Indian mobile number (+91 followed by 10 digits)"),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const insertSubmissionSchema = z.object({
+  participantId: z.string(),
+  answers: z.record(z.string(), z.string()),
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+// Types
+export type InsertParticipant = z.infer<typeof insertParticipantSchema>;
+
+export interface Participant extends InsertParticipant {
+  _id: string;
+  createdAt: Date;
+}
+
+export type InsertSubmission = z.infer<typeof insertSubmissionSchema>;
+
+export interface Submission extends InsertSubmission {
+  _id: string;
+  submittedAt: Date;
+}
+
+export interface SubmissionWithParticipant extends Submission {
+  participant: Participant;
+}
