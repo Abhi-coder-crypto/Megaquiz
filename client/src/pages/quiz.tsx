@@ -107,8 +107,13 @@ export default function QuizPage() {
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/mega-cv-logo.png" alt="MEGA-CV" className="h-10" />
+            <img
+              src="/mega-cv-logo.png"
+              alt="MEGA-CV"
+              className="h-10 rotate-90 origin-center"
+            />
           </div>
+
           <div className="flex items-center gap-4 text-sm text-slate-500">
             <span>
               Question {currentQuestionIndex + 1} of {QUIZ_QUESTIONS.length}
