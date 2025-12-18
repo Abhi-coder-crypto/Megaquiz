@@ -24,6 +24,7 @@ class MongoStorage implements IStorage {
     const uri = process.env.MONGO_URI;
     if (uri) {
       this.client = new MongoClient(uri);
+      console.log("✓ MongoDB configured and ready");
     } else {
       console.warn("MONGO_URI environment variable is not set. Database operations will fail.");
     }
@@ -36,6 +37,7 @@ class MongoStorage implements IStorage {
     if (!this.db) {
       await this.client.connect();
       this.db = this.client.db("megacv_quiz");
+      console.log("✓ MongoDB connected successfully to megacv_quiz database");
     }
     return this.db;
   }
