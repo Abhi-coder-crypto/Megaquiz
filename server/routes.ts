@@ -76,32 +76,21 @@ export async function registerRoutes(
 
   // Admin login endpoint
   app.post("/api/admin/login", async (req, res) => {
-    try {
-      const { username, password } = req.body;
-      
-      const isValid = await storage.verifyAdminCredentials(username, password);
-      
-      if (isValid) {
-        res.json({ success: true, message: "Login successful" });
-      } else {
-        res.status(401).json({ success: false, error: "Invalid credentials" });
-      }
-    } catch (error) {
-      console.error("Error during admin login:", error);
-      res.status(500).json({ success: false, error: "Login failed" });
+    const { username, password } = req.body;
+    
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    
+    if (!adminEmail || !adminPassword) {
+      return res.status(500).json({ success: false, error: "Server configuration error" });
+    }
+    
+    if (username === adminEmail && password === adminPassword) {
+      res.json({ success: true, message: "Login successful" });
+    } else {
+      res.status(401).json({ success: false, error: "Invalid credentials" });
     }
   });
-
-  // Initialize admin credentials from environment if provided
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (adminEmail && adminPassword) {
-    storage.setAdminCredentials(adminEmail, adminPassword).then(() => {
-      console.log("✓ Admin credentials initialized in MongoDB");
-    }).catch((error) => {
-      console.error("Error initializing admin credentials:", error);
-    });
-  }
 
   return httpServer;
 }

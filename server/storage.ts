@@ -7,11 +7,6 @@ import type {
   SubmissionWithParticipant,
 } from "@shared/schema";
 
-export interface AdminCredentials {
-  email: string;
-  password: string;
-}
-
 export interface IStorage {
   createParticipant(participant: InsertParticipant): Promise<Participant>;
   getParticipant(id: string): Promise<Participant | undefined>;
@@ -19,8 +14,6 @@ export interface IStorage {
   hasSubmittedQuiz(email: string, phone?: string): Promise<{ submitted: boolean; reason?: string }>;
   createSubmission(submission: InsertSubmission): Promise<Submission>;
   getAllSubmissions(): Promise<SubmissionWithParticipant[]>;
-  setAdminCredentials(email: string, password: string): Promise<void>;
-  verifyAdminCredentials(email: string, password: string): Promise<boolean>;
 }
 
 class MongoStorage implements IStorage {
@@ -221,29 +214,6 @@ class MongoStorage implements IStorage {
     return results;
   }
 
-  async setAdminCredentials(email: string, password: string): Promise<void> {
-    const db = await this.getDb();
-    const collection = db.collection("admin");
-    
-    await collection.updateOne(
-      { type: "credentials" },
-      { $set: { type: "credentials", email, password, updatedAt: new Date() } },
-      { upsert: true }
-    );
-  }
-
-  async verifyAdminCredentials(email: string, password: string): Promise<boolean> {
-    const db = await this.getDb();
-    const collection = db.collection("admin");
-    
-    try {
-      const admin = await collection.findOne({ type: "credentials" });
-      if (!admin) return false;
-      return admin.email === email && admin.password === password;
-    } catch {
-      return false;
-    }
-  }
 }
 
 export const storage = new MongoStorage();
