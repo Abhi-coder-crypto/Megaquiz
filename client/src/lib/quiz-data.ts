@@ -35,12 +35,12 @@ export const QUIZ_QUESTIONS: Question[] = [
   },
   {
     id: 3,
-    text: "According to SSI guidelines, first-line oral therapy for mild–moderate surgical site infection after clean-contaminated surgery is:",
+    text: "According to SSI guidelines, first-line oral therapy for mild-moderate surgical site infection after clean-contaminated surgery is:",
     type: "mcq",
     options: [
       "Ciprofloxacin",
       "Cefixime",
-      "Amoxicillin–Clavulanate",
+      "Amoxicillin-Clavulanate",
       "Linezolid"
     ]
   },
@@ -62,7 +62,7 @@ export const QUIZ_QUESTIONS: Question[] = [
     options: [
       "Linezolid",
       "Cefixime",
-      "Amoxicillin–Clavulanate",
+      "Amoxicillin-Clavulanate",
       "Doxycycline"
     ]
   },
